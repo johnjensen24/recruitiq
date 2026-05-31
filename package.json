@@ -1,0 +1,10 @@
+{
+  "name": "recruitiq",
+  "version": "0.1.0",
+  "description": "AI-powered college recruiting assistant",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}

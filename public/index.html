@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RecruitIQ — Smarter College Recruiting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0a0e1a; --bg-2: #111726; --bg-3: #1a2236;
+  --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.16);
+  --text: #f4f6fb; --text-dim: #98a3bc; --text-faint: #5a6582;
+  --accent: #ff6b35; --accent-2: #ffb627; --green: #4ade80; --blue: #60a5fa;
+  --serif: 'Instrument Serif', Georgia, serif; --sans: 'Inter', system-ui, sans-serif;
+}
+html, body { height: 100%; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+.app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.sidebar { background: var(--bg-2); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; }
+.logo { font-family: var(--serif); font-size: 28px; font-style: italic; padding: 4px 12px 24px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.logo span { color: var(--text); -webkit-text-fill-color: var(--text); font-family: var(--sans); font-style: normal; font-weight: 600; font-size: 16px; vertical-align: super; }
+.section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-faint); padding: 16px 12px 6px; font-weight: 600; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: var(--text-dim); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+.nav-item:hover { background: var(--bg-3); color: var(--text); }
+.nav-item.active { background: var(--bg-3); color: var(--text); }
+.user-card { margin-top: auto; padding: 12px; background: var(--bg-3); border-radius: 10px; display: flex; gap: 10px; align-items: center; border: 1px solid var(--border); }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 13px; flex-shrink: 0; }
+.user-info { font-size: 12px; min-width: 0; }
+.user-info strong { display: block; }
+.user-info span { color: var(--text-dim); font-size: 11px; }
+.main { padding: 32px 40px; max-width: 1400px; }
+.page-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+.page-title { font-family: var(--serif); font-size: 38px; letter-spacing: -0.02em; }
+.page-title em { font-style: italic; color: var(--accent); }
+.page-sub { color: var(--text-dim); margin-top: 4px; }
+.card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+.card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 16px; font-weight: 600; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.stat-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 600; }
+.stat-card .value { font-family: var(--serif); font-size: 36px; margin-top: 4px; }
+.stat-card.accent { background: linear-gradient(135deg, rgba(255,107,53,0.12), rgba(255,182,39,0.06)); border-color: rgba(255,107,53,0.3); }
+.main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+@media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .app { grid-template-columns: 1fr; } .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; } .user-card { display:none; } }
+.search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; }
+.search-bar input { background: transparent; border: none; outline: none; color: var(--text); font-size: 14px; flex: 1; font-family: var(--sans); }
+.filter-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.pill { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: var(--bg-3); color: var(--text-dim); cursor: pointer; border: 1px solid var(--border); }
+.pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+.coach-list { display: flex; flex-direction: column; gap: 8px; }
+.coach-row { display: grid; grid-template-columns: 40px 1fr auto; gap: 14px; align-items: center; padding: 14px 16px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; }
+.coach-row:hover { border-color: var(--border-strong); background: var(--bg-3); }
+.coach-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-3); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; border: 1px solid var(--border); }
+.coach-info { min-width: 0; }
+.coach-name { font-weight: 600; }
+.coach-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sport-tag { padding: 2px 8px; background: var(--bg-3); border-radius: 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; border: 1px solid var(--border); }
+.email-tag { font-family: monospace; font-size: 11px; color: var(--blue); background: rgba(96,165,250,0.08); padding: 2px 8px; border-radius: 6px; }
+.btn { padding: 7px 14px; border-radius: 8px; background: var(--bg-3); color: var(--text); border: 1px solid var(--border); font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--sans); display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn:hover { background: var(--bg-2); border-color: var(--border-strong); }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { background: #ff5722; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-lg { padding: 12px 22px; font-size: 14px; font-weight: 600; }
+.activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-item { display: flex; gap: 10px; padding: 10px; background: var(--bg-3); border-radius: 10px; font-size: 12px; }
+.activity-item .dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.dot.sent { background: var(--blue); } .dot.opened { background: var(--accent-2); } .dot.replied { background: var(--green); }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+.modal-backdrop.open { display: flex; }
+.modal { background: var(--bg-2); border: 1px solid var(--border-strong); border-radius: 16px; width: 90%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 28px; }
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.modal-title { font-family: var(--serif); font-size: 26px; }
+.modal-title em { font-style: italic; color: var(--accent); }
+.modal-close { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 22px; }
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 600; margin-bottom: 6px; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; background: var(--bg-3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 14px; font-family: var(--sans); outline: none; }
+.form-row input:focus, .form-row textarea:focus, .form-row select:focus { border-color: var(--accent); }
+.form-row textarea { resize: vertical; min-height: 220px; line-height: 1.6; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ai-banner { background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(255,182,39,0.05)); border: 1px solid rgba(255,107,53,0.25); padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+.empty { text-align: center; padding: 40px 20px; color: var(--text-dim); }
+.empty .big { font-family: var(--serif); font-size: 24px; color: var(--text); margin-bottom: 8px; }
+.onboard-shell { display: none; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 20px; }
+.onboard-shell.open { display: flex; }
+.onboard { background: var(--bg-2); border: 1px solid var(--border-strong); border-radius: 18px; padding: 36px 40px; max-width: 540px; width: 100%; }
+.onboard h1 { font-family: var(--serif); font-size: 38px; margin-bottom: 8px; line-height: 1.1; }
+.onboard h1 em { font-style: italic; color: var(--accent); }
+.onboard p.sub { color: var(--text-dim); margin-bottom: 24px; }
+.progress-dots { display: flex; gap: 6px; margin-bottom: 24px; }
+.progress-dots .dot { height: 4px; flex: 1; border-radius: 4px; background: var(--bg-3); }
+.progress-dots .dot.done { background: var(--accent); }
+.app.hidden { display: none; }
+.spinner { width: 14px; height: 14px; border: 2px solid var(--border-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.live-search-state { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--bg-3); border-radius: 10px; font-size: 13px; color: var(--text-dim); margin-top: 12px; }
+.tier-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; text-transform: uppercase; }
+.tier-reach { background: rgba(239,68,68,0.15); color: #fca5a5; }
+.tier-match { background: rgba(96,165,250,0.15); color: #93c5fd; }
+.tier-safety { background: rgba(74,222,128,0.15); color: #86efac; }
+</style>
+</head>
+<body>
+
+<div class="onboard-shell open" id="onboardShell">
+  <div class="onboard">
+    <div class="progress-dots"><div class="dot done" id="dot1"></div><div class="dot" id="dot2"></div><div class="dot" id="dot3"></div></div>
+    <div class="onboard-step" id="step1">
+      <h1>Welcome to <em>RecruitIQ</em></h1>
+      <p class="sub">Get recruited smarter. Tell us about yourself so we can help you reach the right coaches with emails they'll actually read.</p>
+      <div class="form-grid-2">
+        <div class="form-row"><label>First Name</label><input id="o_firstname" placeholder="Marcus" /></div>
+        <div class="form-row"><label>Last Name</label><input id="o_lastname" placeholder="Johnson" /></div>
+      </div>
+      <div class="form-row"><label>Email</label><input id="o_email" type="email" placeholder="you@example.com" /></div>
+      <div class="form-row"><label>Graduation Year</label><select id="o_gradyear"><option>2026</option><option>2027</option><option>2028</option><option>2029</option></select></div>
+      <button class="btn btn-primary btn-lg" onclick="nextStep(2)" style="width:100%; justify-content:center;">Continue</button>
+    </div>
+    <div class="onboard-step" id="step2" style="display:none;">
+      <h1>Your <em>position</em></h1>
+      <p class="sub">RecruitIQ is launching with baseball — built specifically for baseball recruiting.</p>
+      <div class="form-row"><label>Sport</label><select id="o_sport"><option value="baseball" selected>Baseball</option></select></div>
+      <div class="form-row"><label>Position</label><input id="o_position" placeholder="e.g. Right-handed pitcher, Shortstop, Catcher" /></div>
+      <div class="form-grid-2">
+        <div class="form-row"><label>Height</label><input id="o_height" placeholder="6'2&quot;" /></div>
+        <div class="form-row"><label>Weight (lbs)</label><input id="o_weight" placeholder="185" /></div>
+      </div>
+      <div style="display:flex; gap:10px;"><button class="btn" onclick="prevStep(1)" style="flex:1; justify-content:center;">Back</button><button class="btn btn-primary btn-lg" onclick="nextStep(3)" style="flex:2; justify-content:center;">Continue</button></div>
+    </div>
+    <div class="onboard-step" id="step3" style="display:none;">
+      <h1>Your <em>credentials</em></h1>
+      <p class="sub">This personalizes your emails and helps us suggest the right schools.</p>
+      <div class="form-grid-2">
+        <div class="form-row"><label>GPA</label><input id="o_gpa" placeholder="3.7" /></div>
+        <div class="form-row"><label>SAT / ACT</label><input id="o_test" placeholder="1320 / 28" /></div>
+      </div>
+      <div class="form-row"><label>High School</label><input id="o_school" placeholder="Lincoln High School" /></div>
+      <div class="form-row"><label>Key Stats (one line)</label><input id="o_stats" placeholder="e.g. 88-91 mph FB, 1.92 ERA, 74 K in 51 IP" /></div>
+      <div class="form-row"><label>Highlight Tape URL (optional)</label><input id="o_film" placeholder="https://hudl.com/..." /></div>
+      <div style="display:flex; gap:10px;"><button class="btn" onclick="prevStep(2)" style="flex:1; justify-content:center;">Back</button><button class="btn btn-primary btn-lg" onclick="finishOnboarding()" style="flex:2; justify-content:center;">Get Started</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="app hidden" id="appShell">
+  <aside class="sidebar">
+    <div class="logo">RecruitIQ<span>β</span></div>
+    <div class="section-label">Main</div>
+    <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">⬢ Dashboard</div>
+    <div class="nav-item" data-view="coaches" onclick="switchView('coaches')">◉ Find Coaches</div>
+    <div class="nav-item" data-view="outreach" onclick="switchView('outreach')">✎ My Outreach</div>
+    <div class="nav-item" data-view="schools" onclick="switchView('schools')">★ Target Schools</div>
+    <div class="section-label">Tools</div>
+    <div class="nav-item" data-view="profile" onclick="switchView('profile')">⊙ My Profile</div>
+    <div class="nav-item" data-view="settings" onclick="switchView('settings')">⚙ Settings</div>
+    <div class="user-card"><div class="avatar" id="userInitials">MJ</div><div class="user-info"><strong id="userName">Loading</strong><span id="userSubtitle"></span></div></div>
+  </aside>
+  <main class="main">
+    <section class="view" id="view-dashboard">
+      <div class="page-header"><div><div class="page-title">Welcome back, <em id="dashFirstName">there</em></div><div class="page-sub">Here's your recruiting snapshot.</div></div><button class="btn btn-primary" onclick="switchView('coaches')">+ Find New Coaches</button></div>
+      <div class="stat-grid">
+        <div class="stat-card accent"><div class="label">Coaches Contacted</div><div class="value" id="stat-contacted">0</div></div>
+        <div class="stat-card"><div class="label">Replies Received</div><div class="value" id="stat-replies">0</div></div>
+        <div class="stat-card"><div class="label">Target Schools</div><div class="value" id="stat-targets">0</div></div>
+        <div class="stat-card"><div class="label">Days to Signing Day</div><div class="value" id="stat-days">—</div></div>
+      </div>
+      <div class="main-grid">
+        <div class="card"><h3>Suggested next actions</h3><div class="coach-list" id="suggestionsList"></div></div>
+        <div class="card"><h3>Recent activity</h3><div class="activity-list" id="activityList"></div></div>
+      </div>
+    </section>
+    <section class="view" id="view-coaches" style="display:none;">
+      <div class="page-header"><div><div class="page-title">Find <em>coaches</em></div><div class="page-sub">Search our database or look up any coach live.</div></div></div>
+      <div class="search-bar">🔍<input id="coachSearch" placeholder="Search by school, conference, or coach name..." oninput="renderCoachList()" /></div>
+      <div class="filter-pills" id="filterPills">
+        <div class="pill active" data-filter="all" onclick="setFilter('all')">All divisions</div>
+        <div class="pill" data-filter="D1" onclick="setFilter('D1')">D1</div>
+        <div class="pill" data-filter="D2" onclick="setFilter('D2')">D2</div>
+        <div class="pill" data-filter="D3" onclick="setFilter('D3')">D3</div>
+        <div class="pill" data-filter="NAIA" onclick="setFilter('NAIA')">NAIA</div>
+        <div class="pill" data-filter="JUCO" onclick="setFilter('JUCO')">JUCO</div>
+      </div>
+      <div class="coach-list" id="coachList"></div>
+      <div id="liveSearchPanel" style="display:none; margin-top:16px;">
+        <div class="card"><h3>Don't see who you're looking for?</h3><p style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">We'll search the web live for publicly-listed coach contact info.</p><button class="btn btn-primary" onclick="liveSearchCoach()">⚡ Search live for "<span id="searchQuery"></span>"</button><div id="liveSearchResult"></div></div>
+      </div>
+    </section>
+    <section class="view" id="view-outreach" style="display:none;"><div class="page-header"><div><div class="page-title">My <em>outreach</em></div><div class="page-sub">Every email sent, plus follow-up reminders.</div></div></div><div id="outreachList"></div></section>
+    <section class="view" id="view-schools" style="display:none;"><div class="page-header"><div><div class="page-title">Target <em>schools</em></div><div class="page-sub">Reach, match, and safety options for your profile.</div></div></div><div id="schoolsList"></div></section>
+    <section class="view" id="view-profile" style="display:none;"><div class="page-header"><div><div class="page-title">My <em>profile</em></div><div class="page-sub">What coaches see when you share your link.</div></div></div><div id="profileCard"></div></section>
+    <section class="view" id="view-settings" style="display:none;"><div class="page-header"><div><div class="page-title"><em>Settings</em></div></div></div><div class="card"><h3>Account</h3><div class="form-row"><label>Email</label><input id="set_email" /></div><button class="btn btn-ghost" onclick="resetApp()" style="margin-top:8px;">↺ Reset all data</button></div></section>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="composeModal">
+  <div class="modal">
+    <div class="modal-header"><div><div class="modal-title">Email <em id="composeCoachName">Coach</em></div><div style="font-size:13px; color:var(--text-dim); margin-top:4px;" id="composeMeta"></div></div><button class="modal-close" onclick="closeCompose()">✕</button></div>
+    <div class="ai-banner" id="aiBanner"><span>✨</span><span>Generating a personalized email based on your profile and this program...</span></div>
+    <div class="form-row"><label>To</label><input id="composeTo" /></div>
+    <div class="form-row"><label>Subject</label><input id="composeSubject" /></div>
+    <div class="form-row"><label>Message</label><textarea id="composeBody"></textarea></div>
+    <div style="display:flex; gap:10px; margin-top:8px;"><button class="btn" onclick="regenerateEmail()" id="regenBtn">↻ Regenerate</button><button class="btn" onclick="copyEmail()">📋 Copy</button><button class="btn btn-primary" onclick="sendEmail()" style="margin-left:auto;">Send via Email →</button></div>
+  </div>
+</div>
+
+<script src="baseball-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
