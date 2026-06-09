@@ -124,7 +124,7 @@ async function openCompose(coachId){
   const displayName = (coach.name && coach.name.trim()) || 'Coach';
   document.getElementById('composeCoachName').textContent=displayName;
   document.getElementById('composeMeta').textContent=`${coach.title}, ${coach.school} · ${coach.conference}`;
-  document.getElementById('composeTo').value=coach.email||'';
+  document.getElementById('composeTo').value=(coach.emailConfidence==='direct_found'?coach.email:'')||'';
   document.getElementById('composeSubject').value='';
   document.getElementById('composeBody').value='';
   document.getElementById('composeModal').classList.add('open');
@@ -158,7 +158,49 @@ async function openCompose(coachId){
       }
     }catch(e){ /* non-fatal; continue with whatever name we have */ }
   }
+
+  // Lazy EMAIL verification. The stored address is a guessed program inbox
+  // (baseball@domain) that frequently bounces. Replace it with a real,
+  // publicly-listed address found via web search — or leave it BLANK so we
+  // never send to a guess.
+  const emailIsGuess = (coach.emailConfidence !== 'direct_found');
+  if(emailIsGuess && !coach._emailChecked){
+    coach._emailChecked = true;
+    const banner=document.getElementById('aiBanner');
+    banner.style.display='flex';
+    banner.innerHTML='<span class="spinner"></span><span>Finding a verified email for '+coach.school+'...</span>';
+    try{
+      const er=await fetch('/api/find-coach',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ school:coach.school, sport:'baseball', query:coach.school+' baseball recruiting coordinator coach email' }) });
+      const ed=await er.json();
+      // Prefer a recruiting coordinator with a real listed email, else any coach with one.
+      const withEmail=(ed.coaches||[]).filter(c=>c.email && /@/.test(c.email));
+      const pick=withEmail.find(c=>/recruit/i.test(c.title||'')) || withEmail[0];
+      if(pick && pick.email){
+        coach.email=pick.email.trim(); coach.emailConfidence='direct_found';
+        document.getElementById('composeTo').value=coach.email;
+        saveState(); renderCoachList();
+      } else {
+        // No real email published — do NOT fall back to the guessed inbox.
+        coach.email=''; coach.emailConfidence='none_found';
+        coach._noEmailNote = ed.note || 'No public email is listed for this program — most use an online recruiting questionnaire. We left To: blank so you don\u2019t send to an address that bounces.';
+        document.getElementById('composeTo').value='';
+        saveState();
+      }
+    }catch(e){
+      coach.email=''; coach.emailConfidence='none_found';
+      coach._noEmailNote='Couldn\u2019t verify an email right now \u2014 find the program\u2019s recruiting questionnaire or staff directory before sending.';
+      document.getElementById('composeTo').value='';
+    }
+  }
+
   await generateAIEmail(coach);
+
+  // If we have no deliverable address, say so plainly (overrides the success banner).
+  if(!coach.email){
+    const banner=document.getElementById('aiBanner');
+    banner.style.display='flex';
+    banner.innerHTML='<span>\u26a0\ufe0f</span><span>'+(coach._noEmailNote||'No verified email found \u2014 use this program\u2019s recruiting questionnaire instead. To: left blank to prevent a bounce.')+'</span>';
+  }
 }
 function closeCompose(){ document.getElementById('composeModal').classList.remove('open'); appState.currentCoach=null; }
 
